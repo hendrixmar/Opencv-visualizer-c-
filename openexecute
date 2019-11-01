@@ -1,0 +1,4 @@
+g++ -c functions.cpp  
+g++ main.cpp -o main functions.o `pkg-config --cflags --libs opencv`
+
+./main $1
