@@ -9,7 +9,7 @@ int main(int argc, const char *argv[])
         printf("usage: DisplayImage.out <Image_Path>\n");
         return -1;
     }
-    cv::Mat image= cv::imread( argv[1], 1);
+    cv::Mat image= cv::imread( argv[1], 0);
 
     if ( !image.data )
     {
@@ -40,7 +40,6 @@ int main(int argc, const char *argv[])
 		// The function below will do the same as the funcitons above, however it will
 		// use cvui::imshow() (cvui's version of cv::imshow()), which will automatically
 		// call cvui::update() for us.
-
 
 		// Check if ESC key was pressed
 		if (cv::waitKey(20) == 27) {

@@ -15,12 +15,10 @@
 #define WINDOW4_NAME "Windows 4"
 
 
-
+extern bool not_;
 extern int horizontal;
 extern int vertical;
-extern int level_green;
-extern int level_blue;
-extern int level_red;
+extern double level[3];
 extern double grades;
 extern bool RGB[3];
 
@@ -37,3 +35,5 @@ void rotation(cv::Mat source, cv::Mat &destination, double grades);
 void colors( cv::Mat source, cv::Mat &destination);
 
 
+void vertical_borders(cv::Mat source, cv::Mat &destination);
+void horizontal_borders(cv::Mat source, cv::Mat &destination);

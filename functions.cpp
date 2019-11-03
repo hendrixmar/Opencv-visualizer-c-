@@ -1,12 +1,14 @@
 #include "functions.h"
 #include "cvui.h"
- int horizontal = 1;
- int vertical = 1;
- int level_green = 100;
- int level_blue = 100;
- int level_red = 100;
- double grades =0;
- bool RGB[3] ={true, true, true};
+ int horizontal = 0;
+ int vertical = 0;
+
+
+double grades =0;
+bool RGB[3] ={true, true, true};
+double level[3] ={1,1,1};
+bool not_ =false;
+bool verbord_ = false;
 
 
 void compact(const cv::String& name, cv::Mat image, cv::Mat temp) {
@@ -45,11 +47,33 @@ void compact(const cv::String& name, cv::Mat image, cv::Mat temp) {
         cvui::imshow(WINDOW1_NAME, temp);
 	}
 
-    cvui::checkbox(frame, 20, 240, "Red colors", &RGB[2]);
-    cvui::checkbox(frame, 20, 260, "Green colors", &RGB[1]);
-    cvui::checkbox(frame, 20, 280, "Blue colors", &RGB[0]);
-	cvui::update(name);
 	
+    //Color levels section
+    cvui::printf(frame, 300, 5, "Level of red");
+	cvui::printf(frame, 300, 75, "Level of green");
+    cvui::printf(frame, 300, 145, "Level of blue");
+    cvui::checkbox(frame, 400, 240, "Red colors", &RGB[2]) ;
+    cvui::checkbox(frame, 400, 260, "Green colors", &RGB[1]);
+    cvui::checkbox(frame, 400, 280, "Blue colors", &RGB[0]);
+    cvui::checkbox(frame, 400, 300, "Aplied not", &not_);
+    cvui::checkbox(frame, 400, 320, "Vertical border", &verbord_);
+    if ( 
+        cvui::trackbar(frame, 300, 20, 220, &level[2], 0.0, 1.0)  |
+    	cvui::trackbar(frame, 300, 90, 220, &level[1], 0.0, 1.0)  |
+        cvui::trackbar(frame, 300, 160, 220, &level[0], 0.0, 1.0)  |
+        RGB[0] |
+        RGB[1] |
+        RGB[2] 
+        ){
+        
+        colors(image, temp);
+        cvui::imshow(WINDOW1_NAME, temp);
+    }
+    if(verbord_){
+        vertical_borders(image,temp);
+        cvui::imshow(WINDOW1_NAME, temp);
+    }
+    cvui::update(name);
 	// Tell cvui to update its internal structures regarding a particular window
 	// then show it. Below we are using cvui::imshow(), which is cvui's version of
 	// the existing cv::imshow(). They behave exactly the same, the only difference
@@ -86,6 +110,9 @@ void traslation(cv::Mat source, cv::Mat &destination, int tx, int ty){
             for (int ch = 0; ch < number_channels; ch++)
             {
                 *(destination_array + x + ch) = *(base_image_array + width_index + ch);
+
+                if(not_)
+                    *(destination_array + x + ch) = ~ *(destination_array + x + ch);
             }
             
             
@@ -107,8 +134,8 @@ void rotation(cv::Mat source, cv::Mat &destination, double grades){
     int xReference,yReference;
     int newX,newY,x,y;
     
-    int new_height =  ( height_image*abs(COS(grades)) + width_image*abs(SIN(grades))); 
-    int new_width =  ( height_image*abs(SIN(grades)) + width_image*abs(COS(grades)));
+    int new_height = ( height_image*abs(COS(grades)) + width_image*abs(SIN(grades))); 
+    int new_width = ( height_image*abs(SIN(grades)) + width_image*abs(COS(grades)));
     
     destination = cv::Mat::zeros(new_height,new_width,source.type());
     
@@ -124,16 +151,21 @@ void rotation(cv::Mat source, cv::Mat &destination, double grades){
         uchar *ren = source.ptr< uchar > (height_index);
 
         for(int width_index = 0; width_index < width_image; width_index += number_channels){
+            
+            newX = height_index - xReference + xoffset;
+            newY = width_index - yReference + yoffset;
+            x =  xReference + ( newX*COS(grades) - newY*SIN(grades)); 
+                x =  xReference + ( newX*COS(grades) - newY*SIN(grades)); 
+            x =  xReference + ( newX*COS(grades) - newY*SIN(grades)); 
+            y =  yReference + ( newX*SIN(grades) + newY*COS(grades));
+            
             for(int ch = 0; ch < number_channels; ++ch ) {
 
-                newX = height_index - xReference + xoffset;
-                newY = width_index - yReference + yoffset;
-                x =  xReference + ( newX*COS(grades) - newY*SIN(grades)); 
-                y =  yReference + ( newX*SIN(grades) + newY*COS(grades));
-
-                if(x>=0 && x < new_height && y>=0 && y < new_width){
+                if(x >= 0 && x < new_height && y >= 0 && y < new_width){
                     uchar *renc = destination.ptr< uchar > (x);
-                    *(renc + y + ch )  = *(ren + width_index + ch)*RGB[ch];
+                    *(renc + y + ch )  = *(ren + width_index + ch)*RGB[ch]*level[ch];
+
+                    if(not_)  *(renc + y + ch ) =  ~*(renc + y + ch );
                 }
             }
         }
@@ -153,15 +185,69 @@ void colors( cv::Mat source, cv::Mat &destination)
         uchar *row_pixels_destiny = destination.ptr<uchar>(height_index);
         for (int width_index = 0; width_index < number_Columnes; width_index += number_channels)
         {
+            for(int ch = 0; ch < number_channels; ++ch ) {
+                *(row_pixels_destiny + width_index + ch) = *(row_pixels_source + width_index + ch)*level[ch]*RGB[ch];
+                if (not_)
+                    *(row_pixels_destiny + width_index + ch) = ~ *(row_pixels_destiny + width_index + ch);
+            }
+                
+
+        }
+    }
+    
+ 
+}
+
+
+void vertical_borders(cv::Mat source, cv::Mat &destination)
+{   
+    int number_rows =  source.rows;
+    int number_Columnes = source.cols * source.channels();
+    int number_channels = source.channels();
+    
+    //cv::cvtColor(source, temp, CV_BGR2GRAY);
+    for (int height_index = 0; height_index < number_rows; ++height_index)
+    {
+        uchar *row_pixels_source = source.ptr<uchar>(height_index);
+        uchar *row_pixels_destiny = destination.ptr<uchar>(height_index);
+        for (int width_index = 1; width_index < number_Columnes; width_index += number_channels)
+        {
             
-            *(row_pixels_destiny + width_index + R) = *(row_pixels_source + width_index + R)*(level_red/100.0)*RGB[R];
-            *(row_pixels_destiny + width_index + G) = *(row_pixels_source + width_index + G)*(level_green/100.0)*RGB[G];
-            *(row_pixels_destiny + width_index + B) = *(row_pixels_source + width_index + B)*(level_blue/100.0)*RGB[B];
+            *(row_pixels_destiny + width_index ) = 
+            abs(*(row_pixels_source + width_index - 1) -
+                *(row_pixels_source + width_index ) );
+
             
         }
     }
     
+ 
+}
+
+void horizontal_borders(cv::Mat source, cv::Mat &destination)
+{   
+    int number_rows =  source.rows;
+    int number_Columnes = source.cols * source.channels();
+    int number_channels = source.channels();
     
+    //cv::cvtColor(source, temp, CV_BGR2GRAY);
+    for (int height_index = 1; height_index < number_rows; ++height_index)
+    {
+        
+        uchar *row_pixels_destiny = destination.ptr<uchar>(height_index);
+        uchar *row_pixels_a = source.ptr<uchar>(height_index);
+        uchar *row_pixels_b = source.ptr<uchar>(height_index-1);
+        for (int width_index = 1; width_index < number_Columnes; width_index += number_channels)
+        {
+            
+            *(row_pixels_destiny + width_index ) = 
+            abs(*(row_pixels_a + width_index - 1) -
+                *(row_pixels_b + width_index ) );
+
+            
+        }
+    }
     
  
 }
+
