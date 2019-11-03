@@ -1,12 +1,61 @@
 #include "functions.h"
+#include "cvui.h"
+ int horizontal = 1;
+ int vertical = 1;
+ int level_green = 100;
+ int level_blue = 100;
+ int level_red = 100;
+ double grades =0;
+ bool RGB[3] ={true, true, true};
 
-int horizontal;
-int vertical;
-int level_green;
-int level_blue;
-int level_red;
-double grades;
-bool RGB[3];
+
+void compact(const cv::String& name, cv::Mat image, cv::Mat temp) {
+	// Create a frame for this window and fill it with a nice color
+	cv::Mat frame = cv::Mat(400, 600, CV_8UC3);
+	
+	frame = cv::Scalar(49, 52, 49);
+	bool vert_,horz_, rota_;
+    
+	// Inform cvui that the components to be rendered from now one belong to
+	// a window in particular.
+	//
+	// If you don't inform that, cvui will assume the components belong to
+	// the default window (informed in cvui::init()). In that case, the
+	// interactions with all other windows being used will not work.
+	cvui::context(name);
+
+	cvui::printf(frame, 20, 5, "Move image horizontally");
+	cvui::printf(frame, 20, 75, "Move image vertically");
+	vert_ = cvui::trackbar(frame, 20, 20, 220, &horizontal, 0, 100);
+	horz_ = cvui::trackbar(frame, 20, 90, 220, &vertical, 0, 100);
+
+	if (vert_ || horz_) {
+		traslation(image,temp, horizontal, vertical);
+
+		cvui::imshow(WINDOW1_NAME, temp);
+		
+	}
+
+	cvui::printf(frame, 20, 140, "Rotate image");
+	
+	rota_ = cvui::trackbar(frame, 20, 150, 220, &grades, 0.0, 360.0);
+
+	if(rota_){
+		rotation(image, temp, grades);
+        cvui::imshow(WINDOW1_NAME, temp);
+	}
+
+    cvui::checkbox(frame, 20, 240, "Red colors", &RGB[2]);
+    cvui::checkbox(frame, 20, 260, "Green colors", &RGB[1]);
+    cvui::checkbox(frame, 20, 280, "Blue colors", &RGB[0]);
+	cvui::update(name);
+	
+	// Tell cvui to update its internal structures regarding a particular window
+	// then show it. Below we are using cvui::imshow(), which is cvui's version of
+	// the existing cv::imshow(). They behave exactly the same, the only difference
+	// is that cvui::imshow() will automatically call cvui::update(name) for you.
+	cvui::imshow(WINDOW2_NAME, frame);
+}
 
 
 
