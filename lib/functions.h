@@ -1,7 +1,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <math.h>
-#include "lib/cvui.h"
+#include "cvui.h"
 #define CVUI_IMPLEMENTATION
 #define R 2
 #define G 1
@@ -40,7 +40,3 @@ void and_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination);
 void or_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination);
 void not_operation(cv::Mat &source_a);
 void xor_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination);
-
-void sum_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination);
-
-void sub_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination);

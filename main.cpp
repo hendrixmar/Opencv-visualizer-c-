@@ -1,27 +1,28 @@
-#include "functions.h"
-
+#include "lib/functions.h"
+ 
 
 int main(int argc, const char *argv[])
 {   
 	cv::Mat image_a;
 	cv::Mat image_b;
-
+	bool grayscale = atoi(argv[1]);
+	
     if ( argc < 2 )
     {
         printf("usage: DisplayImage.out <Image_Path>\n");
         return -1;
-    }else if(argc == 2){
-		image_a = cv::imread( argv[1], 0);
+    }else if(argc == 3){
+		image_a = cv::imread( argv[2], grayscale);
 		
 		if ( !image_a.data )
 		{
-			printf("No image data \n");
+			printf("No image data %s\n",argv[2]);
 			return -1;
 		}
     
 	}else{
-		image_a = cv::imread( argv[1], 0);
-		image_b = cv::imread( argv[2], 0);
+		image_a = cv::imread( argv[2], grayscale);
+		image_b = cv::imread( argv[3], grayscale);
 		if ( !image_a.data || !image_b.data )
 		{
 			printf("No image data \n");
@@ -50,13 +51,12 @@ int main(int argc, const char *argv[])
 		// In that case, you must call the pair cvui::context(NAME)/cvui::update(NAME)
 		// to render components and update the window.
 
-		if ( argc == 2 )
+		if ( argc == 3 )
     	{
 			
-			
-			unary_operations(WINDOW2_NAME, image_a, temp);
+			unary_operations(WINDOW2_NAME, image_a, temp, grayscale);
 		}else{
-			binary_operations(WINDOW2_NAME, image_a, temp);
+			binary_operations(WINDOW2_NAME, image_a, image_b, grayscale);
 		}
 		//window(WINDOW1_NAME, image);
 		

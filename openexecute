@@ -1,4 +1,4 @@
 g++ -c functions.cpp  
 g++ main.cpp -o main functions.o `pkg-config --cflags --libs opencv`
 #g++ rota.cpp `pkg-config --cflags --libs opencv` && ./a.out
-./main $1 $2
+./main $1 $2 $3
