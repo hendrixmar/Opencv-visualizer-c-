@@ -11,7 +11,7 @@ This project consist of a image visualizer using Opencv c++ and aplying the prim
 ##Instructions to to build and run
 1. You have to give execution permisions to the openexecute file (with superuser chmod +x openexecute)
 1. Than you have to give them 3 extra parameters
-    * The first one must be a 0 or 1 one. If it is zero the images would be loaded with grayscale otherwise with color.
+    * The first one must be a 0 or 1 one. If it is zero the images would be loaded with grayscale otherwise with color. The horizontal and vertical border detections is only available when you select the grayscale option.
     * The other two parameters must be two images to make possible the binary operations
 
 
