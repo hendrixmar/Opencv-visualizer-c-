@@ -21,19 +21,21 @@ extern int vertical;
 extern double level[3];
 extern double grades;
 extern bool RGB[3];
-
+extern bool horbord_;
 
 
 
 // Update and show a window in a single call using cvui::imshow().
-void compact(const cv::String& name, cv::Mat image, cv::Mat temp);
-
+void unary_operations(const cv::String& name, cv::Mat image, cv::Mat );
+void binary_operations(const cv::String& name, cv::Mat image, cv::Mat temp);
 
 void traslation(cv::Mat source, cv::Mat &destination, int tx, int ty);
 
 void rotation(cv::Mat source, cv::Mat &destination, double grades);
 void colors( cv::Mat source, cv::Mat &destination);
 
-
 void vertical_borders(cv::Mat source, cv::Mat &destination);
 void horizontal_borders(cv::Mat source, cv::Mat &destination);
+
+void and_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat destination);
+void or_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat destination);
