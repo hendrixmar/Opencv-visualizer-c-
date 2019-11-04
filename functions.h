@@ -1,7 +1,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <math.h>
-#include "lib/cvui.h"
+#include "cvui.h"
 #define CVUI_IMPLEMENTATION
 #define R 2
 #define G 1
