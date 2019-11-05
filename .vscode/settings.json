@@ -77,5 +77,6 @@
         "__tuple": "cpp",
         "ios": "cpp",
         "queue": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }

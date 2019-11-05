@@ -26,8 +26,8 @@ int main(int argc, const char *argv[])
 
 	// Init cvui. If you don't tell otherwise, cvui will create the required OpenCV
 	// windows based on the list of names you provided.
-	const cv::String windows[] = { WINDOW1_NAME, WINDOW2_NAME};
-	cvui::init(windows, 2);
+	const cv::String windows[] = { WINDOW1_NAME, WINDOW2_NAME,WINDOW3_NAME,WINDOW4_NAME, WINDOW5_NAME};
+	cvui::init(windows, 5);
     
 	
 	

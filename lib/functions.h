@@ -1,6 +1,6 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <math.h>
+
 #include "cvui.h"
 #define CVUI_IMPLEMENTATION
 #define R 2
@@ -13,6 +13,7 @@
 #define WINDOW2_NAME "Windows 2"
 #define WINDOW3_NAME "Windows 3"
 #define WINDOW4_NAME "Windows 4"
+#define WINDOW5_NAME "Windows 5"
 
 
 extern bool not_;
@@ -40,3 +41,4 @@ void and_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination);
 void or_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination);
 void not_operation(cv::Mat &source_a);
 void xor_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination);
+void size_reducing(cv::Mat source, cv::Mat &destination, int size_reduction);

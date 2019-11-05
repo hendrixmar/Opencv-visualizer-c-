@@ -1,5 +1,6 @@
 #include "functions.h"
 #include "cvui.h"
+#include <math.h>
  int horizontal = 0;
  int vertical = 0;
 
@@ -13,6 +14,37 @@ bool horbord_ = false;
 bool bin_operations[5] = {false, false, false, false, false};
 double normal_value = 255.0;
 
+
+void size_reducing(cv::Mat source, cv::Mat &destination, int size_reduction){
+    
+    int temp=2;
+    for (int i = 0; i < size_reduction; i++)
+        temp *= 2;
+
+    int k,i2;
+    int new_height = floor(source.rows / temp);
+    int new_width = floor(source.cols / temp)*3;
+    int auxiliar = floor(source.cols / temp);
+    destination = cv::Mat::zeros(new_height,auxiliar,CV_8UC3);
+    
+    for(int height_index = 0, k = 0; height_index < new_height ; height_index++, k += temp){
+      
+      if(size_reducing == 0) 
+        k=height_index;
+
+      uchar * row_pixels_source = source.ptr <uchar>(k);
+      uchar * row_pixels_destiny = destination.ptr <uchar>(height_index);
+      for( int j = 0, i2 = 0; j < destination.cols*3; j += 3, i2 += temp*3){ 
+        if (size_reducing == 0 ) i2 = j; 
+
+        for(int ch = 0; ch < 3; ++ch ) {               
+            *( row_pixels_destiny + j + ch ) = *(row_pixels_source + i2 + ch);
+        
+        }
+      }
+    }
+   
+}
 
 void sub_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination)
 {   
@@ -98,10 +130,10 @@ void binary_operations(const cv::String& name, cv::Mat image_a, cv::Mat image_b,
 	// interactions with all other windows being used will not work.
 	cvui::context(name);
 
-	cvui::printf(frame, 20, 5, "Move image horizontally");
+	cvui::printf(frame, 20, 5, "Reduce size of image");
 	cvui::printf(frame, 20, 75, "Move image vertically");
-	vert_ = cvui::trackbar(frame, 20, 20, 220, &horizontal, 0, 100);
-	horz_ = cvui::trackbar(frame, 20, 90, 220, &vertical, 0, 100);
+	vert_ = cvui::trackbar(frame, 20, 20, 220, &horizontal, 0, 5);
+	horz_ = cvui::trackbar(frame, 20, 90, 220, &vertical, 0, 64);
     rota_ = cvui::trackbar(frame, 20, 150, 220, &grades, 0.0, 360.0);
     cvui::printf(frame, 300, 5, "Level of red");    cvui::trackbar(frame, 300, 20, 220, &level[2], 0.0, 1.0);
 	cvui::printf(frame, 300, 75, "Level of green"); cvui::trackbar(frame, 300, 90, 220, &level[1], 0.0, 1.0);
@@ -122,10 +154,10 @@ void binary_operations(const cv::String& name, cv::Mat image_a, cv::Mat image_b,
     nor_ = cvui::trackbar(frame, 10, 340, 220, &normal_value, 0.0, 250.0);
 
     cvui::checkbox(frame, 400, 300, "Not operation", &not_);
-    if(!grayscale){
-        cvui::checkbox(frame, 400, 320, "Vertical border", &verbord_);
-        cvui::checkbox(frame, 400, 340, "Horizontal border", &horbord_);
-    }
+    
+    cvui::checkbox(frame, 400, 320, "Vertical border", &verbord_);
+    cvui::checkbox(frame, 400, 340, "Horizontal border", &horbord_);
+    
     
 
     colors(temp_a, temp_b);
@@ -139,7 +171,13 @@ void binary_operations(const cv::String& name, cv::Mat image_a, cv::Mat image_b,
        
 	}
     if(horz_ || vert_){
-        traslation(image_a, temp_b, horizontal, vertical);
+
+        //traslation(image_a, temp_b, horizontal, vertical);
+        if(horizontal != 0)
+            size_reducing(image_a,temp_b, horizontal);
+        else{
+            temp_b = image_a.clone();
+        }
         cvui::imshow(WINDOW4_NAME, temp_b);
     }
 		
@@ -165,15 +203,21 @@ void binary_operations(const cv::String& name, cv::Mat image_a, cv::Mat image_b,
     }
 
 
-    if(horbord_ && !grayscale){
-        horizontal_borders(temp_a,temp_b);
-        swap_mat(temp_a, temp_b);
+    if(horbord_ || verbord_ ){
+
+        cv::cvtColor(image_a, temp_a, CV_BGR2GRAY);
+        temp_b.setTo(cv::Scalar(0));
+        if(horbord_)
+        {
+            horizontal_borders(temp_a,temp_b);
+        }
+        else{
+            vertical_borders(temp_a,temp_b);
+        }
+        cvui::imshow(WINDOW5_NAME, temp_b);
+        
     }
 
-    if(verbord_ && !grayscale){
-        vertical_borders(temp_a,temp_b);
-        swap_mat(temp_a, temp_b);
-    }
 	
     if(sum_  || nor_){
         sum_operation(temp_a,image_b, temp_b);
@@ -206,7 +250,8 @@ void traslation(cv::Mat source, cv::Mat &destination, int tx, int ty){
     int width_image = source.cols * source.channels();
     int number_channels = source.channels();
     int x,y;
-    destination.setTo(cv::Scalar(0));
+    
+    destination = cv::Mat::zeros(height_image, width_image, source.type());
     
 
     for (int height_index = 0; height_index < height_image; ++height_index)
