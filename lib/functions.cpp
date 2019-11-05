@@ -30,11 +30,11 @@ void sub_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination)
 
         for (int width_index = 0; width_index < number_Columnes; width_index += number_channels)
         {
-            
-            *(row_pixels_destiny + width_index ) = 
-                *(row_pixels_a + width_index ) -
-                *(row_pixels_b + width_index );
-
+            for(int ch = 0; ch < number_channels; ++ch ) {
+            *(row_pixels_destiny + width_index + ch) = 
+                *(row_pixels_a + width_index + ch) -
+                *(row_pixels_b + width_index + ch);
+            }
            
         }
     }
@@ -58,92 +58,17 @@ void sum_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination)
 
         for (int width_index = 0; width_index < number_Columnes; width_index += number_channels)
         {
-            
-            *(row_pixels_destiny + width_index ) = 
-                (*(row_pixels_a + width_index ) +
-                *(row_pixels_b + width_index ) )*255/(normal_value);
-
+            for(int ch = 0; ch < number_channels; ++ch ) {
+                *(row_pixels_destiny + width_index + ch) = 
+                    (*(row_pixels_a + width_index + ch) +
+                    *(row_pixels_b + width_index + ch) )*255/(normal_value);
+            }
            
         }
     }
     
  
 }
-
-void unary_operations(const cv::String& name, cv::Mat image, cv::Mat temp, bool grayscale) {
-	// Create a frame for this window and fill it with a nice color
-	cv::Mat frame = cv::Mat(400, 600, CV_8UC3);
-	
-	frame = cv::Scalar(49, 52, 49);
-	bool vert_,horz_, rota_;
-    
-	// Inform cvui that the components to be rendered from now one belong to
-	// a window in particular.
-	//
-	// If you don't inform that, cvui will assume the components belong to
-	// the default window (informed in cvui::init()). In that case, the
-	// interactions with all other windows being used will not work.
-	cvui::context(name);
-
-	cvui::printf(frame, 20, 5, "Move image horizontally");
-	cvui::printf(frame, 20, 75, "Move image vertically");
-	vert_ = cvui::trackbar(frame, 20, 20, 220, &horizontal, 0, 100);
-	horz_ = cvui::trackbar(frame, 20, 90, 220, &vertical, 0, 100);
-    rota_ = cvui::trackbar(frame, 20, 150, 220, &grades, 0.0, 360.0);
-    cvui::printf(frame, 300, 5, "Level of red");
-	cvui::printf(frame, 300, 75, "Level of green");
-    cvui::printf(frame, 300, 145, "Level of blue");
-    cvui::checkbox(frame, 400, 240, "Red colors", &RGB[2]) ;
-    cvui::checkbox(frame, 400, 260, "Green colors", &RGB[1]);
-    cvui::checkbox(frame, 400, 280, "Blue colors", &RGB[0]);
-    cvui::checkbox(frame, 400, 300, "Aplied not", &not_);
-    cvui::checkbox(frame, 400, 320, "Vertical border", &verbord_);
-    cvui::checkbox(frame, 400, 340, "Horizontal border", &horbord_);
-    cvui::trackbar(frame, 300, 20, 220, &level[2], 0.0, 1.0);
-    cvui::trackbar(frame, 300, 90, 220, &level[1], 0.0, 1.0);
-    cvui::trackbar(frame, 300, 160, 220, &level[0], 0.0, 1.0);
-
-
-    
-    if(verbord_){
-        vertical_borders(image,temp);
-        colors(temp, temp);
-        cvui::imshow(WINDOW1_NAME, temp);
-    }
-
-	if (vert_ || horz_) {
-		traslation(image,temp, horizontal, vertical);
-        colors(temp, temp);
-		cvui::imshow(WINDOW1_NAME, temp);
-		
-	}
-
-    if(horbord_){
-        horizontal_borders(image,temp);
-        cvui::imshow(WINDOW1_NAME, temp);
-    }
-
-    if(rota_){
-		rotation(image, temp, grades);
-        colors(temp, temp);
-        cvui::imshow(WINDOW1_NAME, temp);
-	}
-
-
-	cvui::printf(frame, 20, 140, "Rotate image");
-	
-	
-
-	
-    
-    cvui::update(name);
-	// Tell cvui to update its internal structures regarding a particular window
-	// then show it. Below we are using cvui::imshow(), which is cvui's version of
-	// the existing cv::imshow(). They behave exactly the same, the only difference
-	// is that cvui::imshow() will automatically call cvui::update(name) for you.
-	cvui::imshow(WINDOW2_NAME, frame);
-}
-
 
 
 
@@ -203,30 +128,20 @@ void binary_operations(const cv::String& name, cv::Mat image_a, cv::Mat image_b,
     }
     
 
-    
-    /*
-    if(verbord_){
-        vertical_borders(image_a,image_b);
-        colors(image_b, image_b);
-        
-    }
-
-    
-    */
-   
-    
-    traslation(image_a, temp_a, horizontal, vertical);
-    
-    
     colors(temp_a, temp_b);
     swap_mat(temp_a, temp_b);
     
-    
+
     if(rota_){
-		rotation(image_a, temp_b, grades);
-        swap_mat(temp_a, temp_b);
-        
+        cv::cvtColor(image_a, temp_a, CV_BGR2GRAY);
+		rotation(temp_a, temp_b, grades);
+        cvui::imshow(WINDOW3_NAME, temp_b);
+       
 	}
+    if(horz_ || vert_){
+        traslation(image_a, temp_b, horizontal, vertical);
+        cvui::imshow(WINDOW4_NAME, temp_b);
+    }
 		
 		
 	if(not_){
@@ -473,11 +388,11 @@ void and_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination)
 
         for (int width_index = 0; width_index < number_Columnes; width_index += number_channels)
         {
-            
-            *(row_pixels_destiny + width_index ) = 
-                *(row_pixels_a + width_index ) &
-                *(row_pixels_b + width_index );
-
+            for(int ch = 0; ch < number_channels; ++ch ) {
+            *(row_pixels_destiny + width_index + ch) = 
+                *(row_pixels_a + width_index + ch) &
+                *(row_pixels_b + width_index + ch);
+            }
            
         }
     }
@@ -501,9 +416,9 @@ void not_operation(cv::Mat &source_a)
         for (int width_index = 0; width_index < number_Columnes; width_index += number_channels)
         {
             
-            
-            *(row_pixels_a + width_index ) = ~*(row_pixels_a + width_index );
-            
+            for(int ch = 0; ch < number_channels; ++ch ) {
+                *(row_pixels_a + width_index +ch) = ~*(row_pixels_a + width_index + ch);
+            }
 
            
         }
@@ -528,11 +443,11 @@ void or_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination)
 
         for (int width_index = 0; width_index < number_Columnes; width_index += number_channels)
         {
-            
-            *(row_pixels_destiny + width_index ) = 
-                *(row_pixels_a + width_index ) |
-                *(row_pixels_b + width_index );
-
+             for(int ch = 0; ch < number_channels; ++ch ) {
+                *(row_pixels_destiny + width_index + ch) = 
+                *(row_pixels_a + width_index  + ch ) |
+                *(row_pixels_b + width_index  + ch);
+             }
             
         }
     }
@@ -556,11 +471,12 @@ void xor_operation(cv::Mat source_a, cv::Mat source_b, cv::Mat &destination)
 
         for (int width_index = 0; width_index < number_Columnes; width_index += number_channels)
         {
+             for(int ch = 0; ch < number_channels; ++ch ) {
             
-            *(row_pixels_destiny + width_index ) = 
-                *(row_pixels_a + width_index ) ^
-                *(row_pixels_b + width_index );
-
+                *(row_pixels_destiny + width_index + ch) = 
+                *(row_pixels_a + width_index + ch) ^
+                *(row_pixels_b + width_index  + ch);
+             }
            
         }
     }

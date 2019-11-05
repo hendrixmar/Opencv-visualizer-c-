@@ -25,7 +25,7 @@ extern bool horbord_;
 
 
 // Update and show a window in a single call using cvui::imshow().
-void unary_operations(const cv::String& name, cv::Mat image, cv::Mat, bool );
+
 void binary_operations(const cv::String& name, cv::Mat image, cv::Mat temp, bool);
 
 void traslation(cv::Mat source, cv::Mat &destination, int tx, int ty);

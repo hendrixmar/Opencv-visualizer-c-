@@ -11,26 +11,16 @@ int main(int argc, const char *argv[])
     {
         printf("usage: DisplayImage.out <Image_Path>\n");
         return -1;
-    }else if(argc == 3){
-		image_a = cv::imread( argv[2], grayscale);
-		
-		if ( !image_a.data )
-		{
-			printf("No image data %s\n",argv[2]);
-			return -1;
-		}
-    
-	}else{
-		image_a = cv::imread( argv[2], grayscale);
-		image_b = cv::imread( argv[3], grayscale);
-		if ( !image_a.data || !image_b.data )
-		{
-			printf("No image data \n");
-			return -1;
-		}
-		
+    }
+	image_a = cv::imread( argv[2], grayscale);
+	image_b = cv::imread( argv[3], grayscale);
+	if ( !image_a.data || !image_b.data )
+	{
+		printf("No image data \n");
+		return -1;
 	}
-    
+		
+
 
     
 
@@ -51,13 +41,8 @@ int main(int argc, const char *argv[])
 		// In that case, you must call the pair cvui::context(NAME)/cvui::update(NAME)
 		// to render components and update the window.
 
-		if ( argc == 3 )
-    	{
-			
-			unary_operations(WINDOW2_NAME, image_a, temp, grayscale);
-		}else{
-			binary_operations(WINDOW2_NAME, image_a, image_b, grayscale);
-		}
+		binary_operations(WINDOW2_NAME, image_a, image_b, grayscale);
+		
 		//window(WINDOW1_NAME, image);
 		
 		
